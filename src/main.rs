@@ -9,6 +9,7 @@ const DOCKER_REGISTRY: &str = "registry-1.docker.io";
 const GITHUB_REGISTRY: &str = "ghcr.io";
 const K8S_REGISTRY: &str = "registry.k8s.io";
 const QUAY_REGISTRY: &str = "quay.io";
+const GCR_REGISTRY: &str = "gcr.io";
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -32,6 +33,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     check_image_availability(&client, GITHUB_REGISTRY, repo, tag, "https://").await?;
     check_image_availability(&client, K8S_REGISTRY, repo, tag, "https://").await?;
     check_image_availability(&client, QUAY_REGISTRY, repo, tag, "https://").await?;
+    check_image_availability(&client, GCR_REGISTRY, repo, tag, "https://").await?;
     
     Ok(())
 }
@@ -43,6 +45,11 @@ async fn check_image_availability(
     tag: &str,
     protocol: &str,
 ) -> Result<(), Box<dyn Error>> {
+    let manifest_format = match registry {
+        GCR_REGISTRY => "application/vnd.oci.image.index.v1+json",
+        _ => "application/vnd.docker.distribution.manifest.v2+json",
+    };
+
     let url = format!(
         "{protocol}{registry}/v2/{repo}/manifests/{tag}",
         protocol = protocol,
@@ -54,12 +61,13 @@ async fn check_image_availability(
     let mut headers = HeaderMap::new();
     headers.insert(
         ACCEPT,
-        HeaderValue::from_static("application/vnd.docker.distribution.manifest.v2+json"),
+        HeaderValue::from_static(manifest_format),
     );
 
     let token_result = match registry {
         DOCKER_REGISTRY => get_docker_token(client, repo).await,
         GITHUB_REGISTRY => get_github_token(client, repo).await,
+        GCR_REGISTRY => get_google_token(client, repo).await,
         _ => Ok(String::new()),
     };
 
@@ -124,6 +132,21 @@ async fn get_github_token(client: &Client, repo: &str) -> Result<String, Box<dyn
         None => Err("Token not found".into()),
     }
 }
+
+async fn get_google_token(client: &Client, repo: &str) -> Result<String, Box<dyn Error>> {
+    let url = format!(
+        "https://gcr.io/v2/token?scope=repository:{repo}:pull&service=gcr.io",
+        repo = repo
+    );
+    let res = client.get(&url).send().await?;
+    let body = res.text().await?;
+    let v: Value = serde_json::from_str(&body)?;
+    
+    match v["token"].as_str() {
+        Some(token) => Ok(token.to_string()),
+        None => Err("Token not found".into()),
+    }
+} 
 
 fn parse_image_name(image: &str) -> (&str, &str) {
     let parts: Vec<&str> = image.split(':').collect();
