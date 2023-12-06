@@ -2,6 +2,8 @@
 
 Container Registry Image Checker
 
+Simple utility for check image manifest avaliability in several container registries.
+
 ### WIP
 
 Little tool for check if image present in container registries:
@@ -12,14 +14,14 @@ Little tool for check if image present in container registries:
  - quay.io
  - gcr.io
 
- WIP one-liner to check: 
-
+### WIP one-liner to check: 
+```
 for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor; do
     cargo run -- "$image";
 done
+```
 
-
-TODO:
+### TODO:
 
 - refac get_token func's 
 - unwrapping of matches.value_of("IMAGE") is a potential panic point if the "IMAGE" argument is somehow not provided
