@@ -13,10 +13,12 @@ Little tool for check if image present in container registries:
  - registry.k8s.io
  - quay.io
  - gcr.io
+ - registry.opensource.zalan.do
+ - public.ecr.aws
 
-### WIP one-liner to check: 
+### WIP one-liner for testing: 
 ```
-for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator; do
+for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator karpenter/tools; do
     cargo run -- "$image";
 done
 ```
