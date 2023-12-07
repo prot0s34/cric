@@ -19,7 +19,7 @@ Little tool for check if image present in container registries:
 
 ### WIP one-liner for testing: 
 ```
-for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator karpenter/tools gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v16.1.1; do
+for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator karpenter/tools gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v16.1.1 nvidia/cuda; do
     cargo run -- "$image";
 done
 ```
