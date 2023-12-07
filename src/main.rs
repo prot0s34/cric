@@ -7,9 +7,14 @@ use std::error::Error;
 
 const DOCKER_REGISTRY: &str = "registry-1.docker.io";
 const GITHUB_REGISTRY: &str = "ghcr.io";
+const GCR_REGISTRY: &str = "gcr.io";
 const K8S_REGISTRY: &str = "registry.k8s.io";
 const QUAY_REGISTRY: &str = "quay.io";
-const GCR_REGISTRY: &str = "gcr.io";
+const ZALANDO_REGISTRY: &str = "registry.opensource.zalan.do";
+
+// public.ecr.aws
+// registry.gitlab.com
+// nvcr.io
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -31,9 +36,10 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     check_image_availability(&client, DOCKER_REGISTRY, repo, tag, "https://").await?;
     check_image_availability(&client, GITHUB_REGISTRY, repo, tag, "https://").await?;
+    check_image_availability(&client, GCR_REGISTRY, repo, tag, "https://").await?;
     check_image_availability(&client, K8S_REGISTRY, repo, tag, "https://").await?;
     check_image_availability(&client, QUAY_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, GCR_REGISTRY, repo, tag, "https://").await?;
+    check_image_availability(&client, ZALANDO_REGISTRY, repo, tag, "https://").await?;
     
     Ok(())
 }

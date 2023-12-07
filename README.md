@@ -16,7 +16,7 @@ Little tool for check if image present in container registries:
 
 ### WIP one-liner to check: 
 ```
-for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor; do
+for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator; do
     cargo run -- "$image";
 done
 ```
