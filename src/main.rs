@@ -12,7 +12,7 @@ const K8S_REGISTRY: &str = "registry.k8s.io";
 const QUAY_REGISTRY: &str = "quay.io";
 const ZALANDO_REGISTRY: &str = "registry.opensource.zalan.do";
 const ECR_REGISTRY: &str = "public.ecr.aws";
-// registry.gitlab.com
+const GITLAB_REGISTRY: &str = "registry.gitlab.com";
 // nvcr.io
 
 #[tokio::main]
@@ -40,7 +40,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
     check_image_availability(&client, QUAY_REGISTRY, repo, tag, "https://").await?;
     check_image_availability(&client, ZALANDO_REGISTRY, repo, tag, "https://").await?;
     check_image_availability(&client, ECR_REGISTRY, repo, tag, "https://").await?;
-    
+    check_image_availability(&client, GITLAB_REGISTRY, repo, tag, "https://").await?;
+
     Ok(())
 }
 
@@ -75,6 +76,7 @@ async fn check_image_availability(
         GITHUB_REGISTRY => get_github_token(client, repo).await,
         GCR_REGISTRY => get_google_token(client, repo).await,
         ECR_REGISTRY => get_ecr_token(client, repo).await,
+        GITLAB_REGISTRY => get_gitlab_token(client, repo).await,
         _ => Ok(String::new()),
     };
 
@@ -165,6 +167,21 @@ async fn get_ecr_token(client: &Client, repo: &str) -> Result<String, Box<dyn Er
     let v: Value = serde_json::from_str(&body)?;
 
     Ok(v["token"].as_str().unwrap().to_string())
+}
+
+async fn get_gitlab_token(client: &Client, repo: &str) -> Result<String, Box<dyn Error>> {
+    let url = format!(
+        "https://gitlab.com/jwt/auth?service=container_registry&scope=repository:{repo}:pull",
+        repo = repo
+    );
+    let res = client.get(&url).send().await?;
+    let body = res.text().await?;
+    let v: Value = serde_json::from_str(&body)?;
+
+    match v["token"].as_str() {
+        Some(token) => Ok(token.to_string()),
+        None => Err("Token not found".into()),
+    }
 }
 
 fn parse_image_name(image: &str) -> (&str, &str) {

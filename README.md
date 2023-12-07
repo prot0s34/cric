@@ -15,10 +15,11 @@ Little tool for check if image present in container registries:
  - gcr.io
  - registry.opensource.zalan.do
  - public.ecr.aws
+ - registry.gitlab.com
 
 ### WIP one-liner for testing: 
 ```
-for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator karpenter/tools; do
+for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator karpenter/tools gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v16.1.1; do
     cargo run -- "$image";
 done
 ```
