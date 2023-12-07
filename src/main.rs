@@ -4,6 +4,7 @@ use reqwest::header::{HeaderMap, HeaderValue, ACCEPT, AUTHORIZATION};
 use reqwest::Client;
 use serde_json::Value;
 use std::error::Error;
+use futures::future::join_all;
 
 const DOCKER_REGISTRY: &str = "registry-1.docker.io";
 const GITHUB_REGISTRY: &str = "ghcr.io";
@@ -13,7 +14,6 @@ const QUAY_REGISTRY: &str = "quay.io";
 const ZALANDO_REGISTRY: &str = "registry.opensource.zalan.do";
 const ECR_REGISTRY: &str = "public.ecr.aws";
 const GITLAB_REGISTRY: &str = "registry.gitlab.com";
-// nvcr.io
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -33,14 +33,18 @@ async fn main() -> Result<(), Box<dyn Error>> {
 
     let client = Client::new();
 
-    check_image_availability(&client, DOCKER_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, GITHUB_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, GCR_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, K8S_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, QUAY_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, ZALANDO_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, ECR_REGISTRY, repo, tag, "https://").await?;
-    check_image_availability(&client, GITLAB_REGISTRY, repo, tag, "https://").await?;
+    let checkers = vec![
+        check_image_availability(&client, DOCKER_REGISTRY, repo, tag, "https://"),
+        check_image_availability(&client, GITHUB_REGISTRY, repo, tag, "https://"),
+        check_image_availability(&client, GCR_REGISTRY, repo, tag, "https://"),
+        check_image_availability(&client, K8S_REGISTRY, repo, tag, "https://"),
+        check_image_availability(&client, QUAY_REGISTRY, repo, tag, "https://"),
+        check_image_availability(&client, ZALANDO_REGISTRY, repo, tag, "https://"),
+        check_image_availability(&client, ECR_REGISTRY, repo, tag, "https://"),
+        check_image_availability(&client, GITLAB_REGISTRY, repo, tag, "https://"),
+    ];
+
+    let _results = join_all(checkers).await;
 
     Ok(())
 }
