@@ -4,7 +4,12 @@ Container Registry Image Checker
 
 Simple utility for check image manifest avaliability in several container registries.
 
-### WIP
+### Preview:
+<p align="left">
+    <img src="https://github.com/prot0s34/common-repo-stuff/blob/main/cric-preview.gif" alt="Example">
+</p>
+
+### Work In Progress
 
 Little tool for check if image present in container registries:
 
@@ -17,12 +22,8 @@ Little tool for check if image present in container registries:
  - public.ecr.aws
  - registry.gitlab.com
 
-### Preview:
-<p align="left">
-    <img src="https://github.com/prot0s34/common-repo-stuff/blob/main/cric-preview.gif" alt="Example">
-</p>
 
-### WIP one-liner for testing: 
+### one-liner for testing: 
 ```
 for image in library/nginx zaproxy/zaproxy:bare kube-apiserver:v1.28.2 operatorhubio/catalog kaniko-project/executor acid/postgres-operator karpenter/tools gitlab-org/gitlab-runner/gitlab-runner-helper:x86_64-v16.1.1 nvidia/cuda; do
     cargo run -- "$image";
